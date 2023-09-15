@@ -40,8 +40,8 @@ public class Snake extends ApplicationAdapter {
 		camera.setToOrtho(false, screenDim[0],screenDim[1]);
 		batch = new SpriteBatch();
 		
-		snek = new Snek(startCoords, screenDim, screenColor, gridIntegers, 50, coord);
-		apple = new Apple(appColor,gridIntegers);
+		snek = new Snek(startCoords, screenDim, screenColor, 50, coord);
+		apple = new Apple(appColor,gridIntegers, snek.gridMap);
 	}
 
 	/*
@@ -104,7 +104,7 @@ public class Snake extends ApplicationAdapter {
 	public void checkAppleCol(){
 		if(snek.head[0]==apple.coords[0] && snek.head[1]==apple.coords[1]){
 			snek.length++;
-			apple.newPosition(snek.coords);
+			apple.newPosition(snek.gridMap, snek.length);
 		}
 	}
 }

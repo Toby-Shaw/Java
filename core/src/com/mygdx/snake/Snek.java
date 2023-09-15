@@ -9,8 +9,9 @@ public class Snek {
     public int[] head;
     private int[] dimen;
     public int[] color;
-    private int[] gridDim;
+    private int[] gridDim = {16, 16};
     public ArrayList<int[]> coords;
+    public  int[][] gridMap = new int[gridDim[0]][gridDim[1]];
     private int movex;
     private int movey;
     //1 of two factors determining the speed of the snake
@@ -25,12 +26,11 @@ public class Snek {
      * Constructor for the snake, setting up defaults for coordinates/movement and receiving info
      * on the grid size, snake speed, and color
      */
-    public Snek(int[] coordinates, int[] screenDimensions, int[] snakeColor, int[] gridIntegers,
+    public Snek(int[] coordinates, int[] screenDimensions, int[] snakeColor,
         int speedOffset, ArrayList<int[]> coord){
         head = coordinates;
         dimen = screenDimensions;
         color = snakeColor;
-        gridDim = gridIntegers;
         timelag = speedOffset;
         movex = 0;
         movey = 0;
@@ -42,8 +42,17 @@ public class Snek {
         lastMovement[1] = 99;
         perx = dimen[0] / gridDim[0];
         pery = dimen[1] / gridDim[1];
+        setupGrid();
     }
 
+    public void setupGrid(){
+        for(int i = 0; i<gridDim[0]; i++){
+            for(int j=0;j<gridDim[1]; j++){
+                gridMap[i][j] = 1;
+            }
+        }
+        gridMap[head[0]][head[1]] = 0;
+    }
     /*
      * Move the snake based on the movex and movey variables, and then check collisions with the side of the screen.
      * After that, check if the snake has run into itself, update lastMovement, and then
@@ -60,17 +69,16 @@ public class Snek {
             dead = true;
         }
         if(movex!=0 || movey!=0){
-            for(int i = 1; i<coords.size(); i++){
-                if(coords.get(i)[0] == coords.get(0)[0] && coords.get(i)[1]==coords.get(0)[1]){
-                    dead = true;
-                    break;
-                }
-        }
+            if (!dead && gridMap[coords.get(0)[0]][coords.get(0)[1]] == 0){
+                dead = true;
+            } 
             if(!dead){
                 lastMovement[0] = movex;
                 lastMovement[1] = movey;
+                gridMap[head[0]][head[1]] = 0;
         }}
         if(coords.size()>length){
+            gridMap[coords.get(coords.size()-1)[0]][coords.get(coords.size()-1)[1]] = 1;
             coords.remove(coords.size()-1);
         }
     }
