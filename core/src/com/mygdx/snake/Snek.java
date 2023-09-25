@@ -21,6 +21,9 @@ public class Snek {
     private int pery;
     public boolean dead;
     private int[] lastMovement = new int[2];
+    //The number of nanoseconds given as a bonus to prevent death
+    public long leeway = 30000000;
+    public boolean deathSave = true;
 
     /*
      * Constructor for the snake, setting up defaults for coordinates/movement and receiving info
@@ -55,32 +58,43 @@ public class Snek {
     }
     /*
      * Move the snake based on the movex and movey variables, and then check collisions with the side of the screen.
-     * After that, check if the snake has run into itself, update lastMovement, and then
+     * After that, check if the snake has run into itself, acting on leeway if needed, update lastMovement, and then
      * finish up correcting the list/order of snake coordinate squares
      */
-    public void move(){
+    public long move(long prevMoveTime){
         int f = head[0];
         int j = head[1];
         int[] copy = {f, j};
         coords.add(1, copy);
         head[0] = head[0] + movex;
         head[1] = head[1] + movey;
-        if(head[0]>=gridDim[0] || head[1]>=gridDim[1] || head[0]<0 || head[1]<0 ){
-            dead = true;
-        }
         if(movex!=0 || movey!=0){
-            if (!dead && gridMap[coords.get(0)[0]][coords.get(0)[1]] == 0){
-                dead = true;
+            if ((head[0]>=gridDim[0] || head[1]>=gridDim[1] || head[0]<0 || head[1]<0) || (
+                !dead && gridMap[coords.get(0)[0]][coords.get(0)[1]] == 0
+            )){
+                if(deathSave){
+                    //When about to die, delay the death action by the leeway amount, so they can
+                    //input a movement to avoid it, to avoid unsatisfying endings. Resets once
+                    //a square has been moved normally.
+                    deathSave = false;
+                    head[0] -= movex;
+                    head[1] -= movey;
+                    coords.remove(1);
+                    return(prevMoveTime + leeway);
+                }
+                else dead=true;
             } 
-            if(!dead){
+            else{
                 lastMovement[0] = movex;
                 lastMovement[1] = movey;
                 gridMap[head[0]][head[1]] = 0;
+                deathSave = true;
         }}
         if(coords.size()>length){
             gridMap[coords.get(coords.size()-1)[0]][coords.get(coords.size()-1)[1]] = 1;
             coords.remove(coords.size()-1);
         }
+        return(prevMoveTime);
     }
 
     /*
@@ -88,11 +102,13 @@ public class Snek {
      */
     public void setDir(int x, int y){
         if(coords.size()>1){
+            //The movement cannot force the snake to go back into itself, otherwise it is fine
             if((x != -lastMovement[0]) && (y != -lastMovement[1])){
                 movex = x;
                 movey = y;
             }
         }
+        //If there is only one square, it can do what it wants
         else{
             movex = x;
             movey = y;

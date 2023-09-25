@@ -9,7 +9,7 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.setTitle("Snake");
-		config.setWindowedMode(800, 800);
+		config.setWindowedMode(1000, 1000);
 		config.setForegroundFPS(60);
 		new Lwjgl3Application(new Snake(), config);
 	}
