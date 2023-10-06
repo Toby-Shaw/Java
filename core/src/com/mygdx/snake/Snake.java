@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class Snake extends ApplicationAdapter {
 	//batch works for textures, shape for simple shapes and arcs
 	SpriteBatch batch;
+	BitmapFont score;
 	ShapeRenderer shape;
 	Snek snek;
 	ArrayList<Apple> apples = new ArrayList<Apple>();
@@ -30,7 +32,7 @@ public class Snake extends ApplicationAdapter {
 	private long lastRotateTime;
 	private Texture compassImage;
 	private Rectangle compassRect;
-	double rad = Math.sqrt(400*400 + 400*400);
+	final double rad = Math.sqrt(400*400 + 400*400);
 
 	/*
 	 * Beginning method, setting up defaults and settings for everything
@@ -48,11 +50,12 @@ public class Snake extends ApplicationAdapter {
 		camera.setToOrtho(false, screenDim[0],screenDim[1]);
 		camera.zoom += Math.sqrt(2)-1;
 		batch = new SpriteBatch();
+		score = new BitmapFont();
 		compassImage = new Texture(Gdx.files.internal("compassWhite.png"));
 		compassRect = new Rectangle();
 		keepCompassStill(0.00001f);
 		snek = new Snek(startCoords, screenDim, screenColor, 50, coord);
-		for(int i=0;i<5;i++){
+		for(int i=0;i<3;i++){
 			Apple app = new Apple(appColor, gridIntegers, snek.gridMap);
 			apples.add(i, app);
 		}
@@ -72,8 +75,8 @@ public class Snake extends ApplicationAdapter {
 		batch.draw(compassImage, compassRect.x, compassRect.y, compassRect.x, compassRect.y, compassImage.getWidth(),
 		compassImage.getHeight(), 1f, 1f, 1f, 0, 0, 
 			compassImage.getWidth(), compassImage.getHeight(), false, false);
+		score.draw(batch, "Score: " + (snek.length - 4), 0, 800);
 		batch.end();
-
 		shape.setProjectionMatrix(camera.combined);
 		ArrayList<int[]> rects = snek.rectPlacements();
 		shape.begin(ShapeType.Line);
@@ -152,6 +155,6 @@ public class Snake extends ApplicationAdapter {
 	public void keepCompassStill(float vel){
 		if(vel != 0){
 			compassRect.x = (float) (Math.cos((-radPos)/180*Math.PI)*rad)+325;
-			compassRect.y = (float) (Math.sin((-radPos)/180*Math.PI)*rad)+338;
+			compassRect.y = (float) (Math.sin((-radPos)/180*Math.PI)*rad)+340;
 	}}
 }
